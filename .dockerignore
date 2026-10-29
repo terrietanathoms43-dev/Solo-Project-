@@ -1,0 +1,12 @@
+.git
+.github
+__pycache__
+.pytest_cache
+*.pyc
+tests
+README.md
+RUNBOOK.md
+NINE_STEP_NOTES.md
+requirements-dev.txt
+.env
+.env.*
