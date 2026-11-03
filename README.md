@@ -12,7 +12,8 @@ A small Flask API packaged in Docker, tested automatically by GitHub Actions, an
 - ✅ GitHub Actions CI: tests first, then builds and pushes to GHCR tagged with the Git commit.
 - ✅ Optional SSH deployment and one-action rollback *workflow files* are included.
 - ✅ **Verified LocalStack Hobby demonstration:** Flask API deployed as a Lambda ZIP, with HTTP health checks and Lambda version rollback. See [LOCALSTACK_HOBBY.md](LOCALSTACK_HOBBY.md) and the [green run](https://github.com/terrietanathoms43-dev/Solo-Project-/actions/runs/41688357772).
-- ⏳ A **Docker-image** deployment and rollback on an instructor-approved host are **not yet verified**. The Lambda version rollback does not satisfy the previous-image rollback requirement.
+- ✅ **Verified temporary Docker-container deployment and rollback:** Two commit-tagged Docker images were run and health-checked on a GitHub Actions runner; the previous image was successfully restored. See [DOCKER_DEPLOYMENT_EVIDENCE.md](DOCKER_DEPLOYMENT_EVIDENCE.md) and the [successful Docker run](https://github.com/terrietanathoms43-dev/Solo-Project-/actions/runs/41690335739).
+- ⏳ Deployment and image rollback **on an instructor-approved persistent Docker host or AWS/LocalStack container environment** are **not yet verified**. The GitHub Actions runner was temporary; the separate Lambda demonstration is not a Docker container deployment.
 
 ### Architecture
 
