@@ -1,0 +1,62 @@
+name: LocalStack Connection Check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/localstack-check.yml
+
+permissions:
+  contents: read
+
+jobs:
+  localstack-check:
+    name: Test API and verify LocalStack connection
+    runs-on: ubuntu-latest
+    env:
+      LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install and test Tidewater Tours API
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pytest -q
+
+      - name: Confirm LocalStack CI token is configured
+        shell: bash
+        run: |
+          if [ -z "$LOCALSTACK_AUTH_TOKEN" ]; then
+            echo "::error::Missing GitHub Actions repository secret LOCALSTACK_AUTH_TOKEN"
+            exit 1
+          fi
+          echo "LocalStack CI token is configured (value not displayed)."
+
+      - name: Install current LocalStack CLI
+        run: npm install -g @localstack/lstk
+
+      - name: Set up AWS CLI profile for LocalStack
+        run: lstk setup aws
+
+      - name: Start LocalStack
+        run: lstk start
+
+      - name: Verify emulated AWS service
+        run: |
+          aws --profile localstack s3api create-bucket --bucket tidewater-ci-localstack-check
+          aws --profile localstack s3api list-buckets --query 'Buckets[].Name' --output text | grep -F 'tidewater-ci-localstack-check'
+          curl --fail --silent --show-error http://localhost:4566/_localstack/health
+
+      - name: LocalStack diagnostics on failure
+        if: failure()
+        run: lstk logs --verbose || true
