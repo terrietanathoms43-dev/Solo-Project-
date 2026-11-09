@@ -87,10 +87,10 @@ docker build -t tidewater-tours:local .
 Start the container:
 
 ```bash
-docker run --rm -p 127.0.0.1:8080:8000 tidewater-tours:local
+docker run --rm -p 127.0.0.1:8000:8000 tidewater-tours:local
 ```
 
-The containerized API is available at **http://127.0.0.1:8080**.
+The containerized API is available at **http://127.0.0.1:8000**.
 
 The Dockerfile uses a slim Python base image, runs Gunicorn on port `8000`, and includes a container health check.
 
@@ -120,7 +120,7 @@ The SSH deployment workflow supports Linux hosts with Docker, curl, and SSH acce
 
 The server also needs access to the GHCR image, including registry authentication if the package is private.
 
-When deployment is enabled, a successful push to `main` invokes [`scripts/remote_deploy.sh`](scripts/remote_deploy.sh). The script pulls the new image, performs a pre-deployment health check, starts the service on `127.0.0.1:8080`, and checks its health again.
+When deployment is enabled, a successful push to `main` invokes [`scripts/remote_deploy.sh`](scripts/remote_deploy.sh). The script pulls the new image, performs a pre-deployment health check, publishes the service on server port `8000` (mapping `8000:8000` by default), and checks `http://127.0.0.1:8000/health` on the server.
 
 After at least two different image versions have been deployed, use **Actions → Roll back previous image → Run workflow** to restore the prior image. The deployment script also attempts to restore the previous image if a new deployment fails its final health check.
 
@@ -157,6 +157,6 @@ These workflows run in temporary environments; they do not create a persistent p
 | `python app.py` | Start the development API |
 | `python -m pytest -q` | Run automated tests |
 | `docker build -t tidewater-tours:local .` | Build a local Docker image |
-| `docker run --rm -p 127.0.0.1:8080:8000 tidewater-tours:local` | Run the API in Docker |
+| `docker run --rm -p 127.0.0.1:8000:8000 tidewater-tours:local` | Run the API in Docker |
 
 For deployment operations, use the corresponding workflows in the repository's **Actions** tab.
